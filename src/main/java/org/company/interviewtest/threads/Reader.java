@@ -4,27 +4,27 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import main.java.org.company.interviewtest.FileManagerImpl;
+import main.java.org.company.interviewtest.util.FileMultithreadUtil;
 
 public class Reader implements Runnable {
 
     private OutputStream output;
+    private String inputFile;
 
     public Reader() {
     }
 
-    public Reader(OutputStream outputStream) {
+    public Reader(OutputStream outputStream, String inputFile) {
         this.output = outputStream;
+        this.inputFile = inputFile;
     }
 
     public void run() {
-        System.out.println("t1 start...");
+        System.out.println("reader start...");
         //opens source file ...
-        try (FileInputStream fileIn = new FileInputStream("C://Users/ft20fd/development/gc.log")) { //args[0]
-            // ... and copies to pipe.
-            long totalBytes = copy(fileIn, output, "t1", "from src file into pipe");
+        try (FileInputStream fileIn = new FileInputStream(inputFile)) {
+            long totalBytes = FileMultithreadUtil.copy(fileIn, output, Thread.currentThread().getName(), "from src file into pipe");
             System.out.format("Reading from source file completed. Total: %d bytes.%n", totalBytes);
-            fileIn.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         } finally {
@@ -34,22 +34,8 @@ public class Reader implements Runnable {
                 throw new RuntimeException(ex);
             }
         }
-        System.out.println("t1 done.");
+        System.out.println(Thread.currentThread().getName() + " done.");
     }
 
-    private static long copy(InputStream from, OutputStream to, String thread, String msg)
-        throws IOException {
-        byte[] buf = new byte[FileManagerImpl.BUFF_SIZE];
-        long total = 0;
-        while (true) {
-            int r = from.read(buf);
-            if (r == -1) {
-                break;
-            }
-            to.write(buf, 0, r);
-            total += r;
-            System.out.format("I am %s, and I copied %d bytes %s.%n", thread, r, msg);
-        }
-        return total;
-    }
+
 }

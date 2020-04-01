@@ -1,18 +1,16 @@
-package com.ing.mwchapter;
+package org.company.interviewtest;
 
 import java.io.IOException;
-import main.java.org.company.interviewtest.FileCopierFacade;
 
 public class App {
 
-  public static void main(String[] args) {
-    System.out.println("\"Talent wins games, but teamwork and intelligence win championships.\" – Michael Jordan");
-
-    FileCopierFacade fileCopier = new FileCopierFacade();
-    try {
-      fileCopier.copyFile("", "");
-    } catch (IOException e) {
-      e.printStackTrace();
+    public static void main(String[] args) {
+        FileCopierFacade fileCopier = new FileCopierFacade();
+        // "C://Users/ft20fd/development/gc.log" C://Users/ft20fd/development/gc-tmp.log
+        try {
+            fileCopier.copyFile(args[0], args[1]);
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-  }
 }

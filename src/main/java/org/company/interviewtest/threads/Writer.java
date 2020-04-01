@@ -3,27 +3,28 @@ package main.java.org.company.interviewtest.threads;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import main.java.org.company.interviewtest.FileManagerImpl;
+import main.java.org.company.interviewtest.util.FileMultithreadUtil;
 
 public class Writer implements Runnable {
 
     private InputStream input;
+    private String destFile;
 
     public Writer() {
     }
 
-    public Writer(InputStream inputStream) {
+    public Writer(InputStream inputStream, String destFile) {
         this.input = inputStream;
+        this.destFile = destFile;
     }
 
     @Override
     public void run() {
         System.out.println("t2 start...");
         // opens dest file ...
-        try (FileOutputStream fileOut = new FileOutputStream("C://Users/ft20fd/development/gc-copy.log")) {//args[1]
+        try (FileOutputStream fileOut = new FileOutputStream(destFile)) {
             // ... and copies from pipe.
-            long totalBytes = copy(input, fileOut, "t2", "from pipe into dest file");
+            long totalBytes = FileMultithreadUtil.copy(input, fileOut, Thread.currentThread().getName(), "from pipe into dest file");
             System.out.format("Writing to dest file completed. Total: %d bytes.%n", totalBytes);
         } catch (IOException e) {
             e.printStackTrace(System.err);
@@ -34,22 +35,7 @@ public class Writer implements Runnable {
                 ex.printStackTrace(System.err);
             }
         }
-        System.out.println("t2 done.");
+        System.out.println(Thread.currentThread().getName() + " done.");
     }
 
-    private static long copy(InputStream from, OutputStream to, String thread, String msg)
-        throws IOException {
-        byte[] buf = new byte[FileManagerImpl.BUFF_SIZE];
-        long total = 0;
-        while (true) {
-            int r = from.read(buf);
-            if (r == -1) {
-                break;
-            }
-            to.write(buf, 0, r);
-            total += r;
-            System.out.format("I am %s, and I copied %d bytes %s.%n", thread, r, msg);
-        }
-        return total;
-    }
 }
